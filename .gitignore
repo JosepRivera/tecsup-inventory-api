@@ -1,0 +1,22 @@
+# Entorno virtual
+.venv/
+
+# Variables de entorno (nunca subir al repo)
+.env
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Imágenes temporales generadas por el código
+imagen_procesada.jpg
+
+# Editores
+.vscode/
+.idea/
+
+# Sistema
+.DS_Store
+Thumbs.db
