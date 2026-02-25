@@ -1,22 +1,28 @@
 # Entorno virtual
 .venv/
+venv/
 
-# Variables de entorno (nunca subir al repo)
+# Variables de entorno con credenciales
 .env
 
-# Python cache
+# Base de datos local
+database.db
+
+# Python
 __pycache__/
-*.pyc
+*.py[cod]
 *.pyo
-*.pyd
 
-# Imágenes temporales generadas por el código
-imagen_procesada.jpg
+# Archivos temporales de audio
+*.wav
+*.mp3
+*.m4a
+*.ogg
+*.webm
 
-# Editores
+# PDFs generados
+exports/
+
+# Editor
 .vscode/
 .idea/
-
-# Sistema
-.DS_Store
-Thumbs.db

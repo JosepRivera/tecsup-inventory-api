@@ -1,34 +1,39 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routes.ocr import router as ocr_router
+
+from core.config import settings
+from core.database import init_db
+from routes import ocr, voz, sesion, dashboard, busqueda, exportar
 
 app = FastAPI(
-    title="Inventario Tecsup API",
-    description="API para escanear etiquetas de dispositivos y registrar inventario en GLPI",
+    title="GLPI Inventario Móvil",
+    description="API para inventariado de dispositivos con OCR y voz.",
     version="1.0.0",
 )
 
-# CORS: permite que la app móvil se conecte
+# CORS abierto en desarrollo para que el celular pueda conectarse por IP local
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # En producción cambiar por la IP de la app
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Rutas
-app.include_router(ocr_router)
+# Inicializar base de datos al arrancar
+@app.on_event("startup")
+def startup():
+    init_db()
+
+# Registro de routers
+app.include_router(ocr.router)
+app.include_router(voz.router)
+app.include_router(sesion.router)
+app.include_router(dashboard.router)
+app.include_router(busqueda.router)
+app.include_router(exportar.router)
 
 
 @app.get("/")
-async def root():
-    return {
-        "proyecto": "Inventario Tecsup",
-        "version": "1.0.0",
-        "docs": "/docs",
-        "endpoints": {
-            "ocr": "/api/ocr/escanear-etiqueta",
-            "health": "/api/ocr/health"
-        }
-    }
+def root():
+    return {"estado": "ok", "ambiente": settings.APP_ENV}
