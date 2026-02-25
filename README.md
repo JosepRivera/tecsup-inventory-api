@@ -87,7 +87,6 @@ Construida con **FastAPI**, **Claude Vision (Haiku)** y **Whisper**, procesa im�
 | **Búsqueda rápida** — Buscar activos por nombre, modelo o número de serie                                     | ✅ Listo                     |
 | **Exportar PDF** — Resumen de jornada con tabla de activos y estadísticas por origen                          | ✅ Listo                     |
 | **Exportar Excel** — Resumen de jornada con dos hojas: resumen y tabla completa con autofilter                | ✅ Listo                     |
-| **Integración GLPI** — Registro automático en GLPI via REST API                                               | ⏳ Pendiente de credenciales |
 
 ---
 
