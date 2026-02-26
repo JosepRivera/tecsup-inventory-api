@@ -5,11 +5,11 @@
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688?style=for-the-badge&logo=fastapi&logoColor=white&labelColor=009688&color=2d2d2d)](https://fastapi.tiangolo.com/)
 [![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=for-the-badge&logo=python&logoColor=white&labelColor=3776AB&color=2d2d2d)](https://www.python.org/)
 [![Anthropic](https://img.shields.io/badge/Claude_Vision-Haiku-CC785C?style=for-the-badge&logoColor=white&labelColor=CC785C&color=2d2d2d)](https://www.anthropic.com/)
-[![GLPI](https://img.shields.io/badge/GLPI-REST_API-FF6900?style=for-the-badge&logoColor=white&labelColor=FF6900&color=2d2d2d)](https://glpi-project.org/)
+[![Groq](https://img.shields.io/badge/Groq-Whisper-F55036?style=for-the-badge&logoColor=white&labelColor=F55036&color=2d2d2d)](https://console.groq.com/)
 [![MIT License](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge&logo=opensourceinitiative&logoColor=white&labelColor=yellow&color=2d2d2d)](./LICENSE)
 
 **REST API para inventariado inteligente de dispositivos tecnológicos.**  
-Escanea etiquetas con la cámara del celular y registra automáticamente en GLPI.
+Escanea etiquetas con la cámara del celular y registra en el sistema con IA.
 
 </div>
 
@@ -44,9 +44,9 @@ Escanea etiquetas con la cámara del celular y registra automáticamente en GLPI
 
 **Tecsup Inventory API** es el backend de un sistema de inventariado de dispositivos tecnológicos desarrollado como proyecto de pasantía en **Tecsup**.
 
-El problema que resuelve: inventariar manualmente ~5000 equipos distribuidos en más de 20 laboratorios es un proceso lento y propenso a errores. Esta API permite que un técnico tome una foto de la etiqueta de cualquier dispositivo con su celular y obtenga automáticamente los datos estructurados (marca, modelo, número de serie, etc.) listos para registrar en el sistema GLPI del instituto. Alternativamente, puede dictar la información por voz y el sistema la interpreta y estructura automáticamente.
+El problema que resuelve: inventariar manualmente ~5000 equipos distribuidos en más de 20 laboratorios es un proceso lento y propenso a errores. Esta API permite que un técnico tome una foto de la etiqueta de cualquier dispositivo con su celular y obtenga automáticamente los datos estructurados (marca, modelo, número de serie, etc.) listos para registrar en el sistema. Alternativamente, puede dictar la información por voz y el sistema la interpreta y estructura automáticamente.
 
-Construida con **FastAPI**, **Claude Vision (Haiku)** y **Whisper**, procesa imágenes y audio en tiempo real con alta precisión incluso en condiciones de poca iluminación.
+Construida con **FastAPI**, **Claude Vision (Haiku)** y **Groq Whisper API**, procesa imágenes y audio en tiempo real con alta precisión incluso en condiciones de poca iluminación.
 
 ---
 
@@ -61,7 +61,7 @@ Construida con **FastAPI**, **Claude Vision (Haiku)** y **Whisper**, procesa im�
 **IA & OCR**
 
 ![Anthropic](https://img.shields.io/badge/Claude_Vision_Haiku-CC785C?style=flat-square&logoColor=white)
-![Whisper](https://img.shields.io/badge/Whisper-412991?style=flat-square&logo=openai&logoColor=white)
+![Groq](https://img.shields.io/badge/Groq_Whisper_API-F55036?style=flat-square&logoColor=white)
 ![Pillow](https://img.shields.io/badge/Pillow-3776AB?style=flat-square&logo=python&logoColor=white)
 
 **Exportación**
@@ -69,24 +69,19 @@ Construida con **FastAPI**, **Claude Vision (Haiku)** y **Whisper**, procesa im�
 ![ReportLab](https://img.shields.io/badge/ReportLab-PDF-red?style=flat-square&logoColor=white)
 ![OpenPyXL](https://img.shields.io/badge/OpenPyXL-Excel-217346?style=flat-square&logoColor=white)
 
-**Integración**
-
-![GLPI](https://img.shields.io/badge/GLPI_REST_API-FF6900?style=flat-square&logoColor=white)
-![HTTPX](https://img.shields.io/badge/HTTPX-009688?style=flat-square&logoColor=white)
-
 ---
 
 ## Funcionalidades
 
-| Módulo                                                                                                        | Estado                      |
-| ------------------------------------------------------------------------------------------------------------- | --------------------------- |
-| **OCR de etiquetas** — Foto → preprocesamiento → JSON estructurado con Claude Vision                          | ✅ Listo                     |
-| **Dictado de voz** — Audio del técnico → Whisper → Claude → JSON de inventario                                | ✅ Listo                     |
-| **Contexto de sesión** — Pabellón/laboratorio/armario aplicado automáticamente a cada activo                  | ✅ Listo                     |
-| **Dashboard de sesión** — Listado en tiempo real de activos registrados en la jornada, con opción de deshacer | ✅ Listo                     |
-| **Búsqueda rápida** — Buscar activos por nombre, modelo o número de serie                                     | ✅ Listo                     |
-| **Exportar PDF** — Resumen de jornada con tabla de activos y estadísticas por origen                          | ✅ Listo                     |
-| **Exportar Excel** — Resumen de jornada con dos hojas: resumen y tabla completa con autofilter                | ✅ Listo                     |
+| Módulo                                                                                          | Estado                      |
+| ----------------------------------------------------------------------------------------------- | --------------------------- |
+| **OCR de etiquetas** — Foto → preprocesamiento → JSON estructurado con Claude Vision            | ✅ Listo                     |
+| **Dictado de voz** — Audio → Groq Whisper → Claude → JSON de inventario                         | ✅ Listo                     |
+| **Contexto de sesión** — Laboratorio/armario aplicado automáticamente a cada activo             | ✅ Listo                     |
+| **Dashboard de sesión** — Listado en tiempo real de activos registrados, con opción de deshacer | ✅ Listo                     |
+| **Búsqueda rápida** — Buscar activos por nombre, modelo o número de serie                       | ✅ Listo                     |
+| **Exportar PDF** — Resumen de jornada con tabla de activos y estadísticas por origen            | ✅ Listo                     |
+| **Exportar Excel** — Dos hojas: resumen de jornada y tabla completa con autofilter              | ✅ Listo                     |
 
 ---
 
@@ -116,7 +111,7 @@ tecsup-inventory-api/
 │
 ├── services/
 │   ├── claude_service.py            # Llamadas a Claude Vision y Claude texto
-│   ├── whisper_service.py           # Transcripción de audio con Whisper local
+│   ├── whisper_service.py           # Transcripción de audio con Groq Whisper API
 │   ├── sesion_service.py            # Lógica de contexto y jornada activa
 │   ├── activo_service.py            # CRUD de activos en SQLite
 │   ├── busqueda_service.py          # Búsqueda en SQLite (stub preparado para GLPI)
@@ -138,8 +133,8 @@ tecsup-inventory-api/
 │   └── voz_prompt.py                # Prompt estructurado para Claude texto
 │
 └── utils/
-    ├── image_utils.py               # Preprocesamiento de imagen (contraste, resize)
-    └── audio_utils.py               # Validación y conversión de formato de audio
+    ├── image_utils.py               # Preprocesamiento de imagen (resize)
+    └── audio_utils.py               # Validación de formato de audio
 ```
 
 ---
@@ -152,16 +147,13 @@ Copia el archivo de ejemplo antes de iniciar:
 cp .env.example .env
 ```
 
-| Variable            | Descripción                          | Ejemplo                       |
-| ------------------- | ------------------------------------ | ----------------------------- |
-| `ANTHROPIC_API_KEY` | API Key de Anthropic (Claude Vision) | `sk-ant-...`                  |
-| `APP_ENV`           | Entorno de ejecución                 | `development`                 |
-| `APP_HOST`          | Host del servidor                    | `0.0.0.0`                     |
-| `APP_PORT`          | Puerto del servidor                  | `8000`                        |
-| `GLPI_URL`          | URL base del GLPI del instituto      | `https://glpi.appstecsup.com` |
-| `GLPI_APP_TOKEN`    | App Token de la API REST de GLPI     | —                             |
-| `GLPI_USER_TOKEN`   | User Token de la API REST de GLPI    | —                             |
-
+| Variable            | Descripción                             | Ejemplo       |
+| ------------------- | --------------------------------------- | ------------- |
+| `ANTHROPIC_API_KEY` | API Key de Anthropic (Claude Vision)    | `sk-ant-...`  |
+| `GROQ_API_KEY`      | API Key de Groq (Whisper transcripción) | `gsk_...`     |
+| `APP_ENV`           | Entorno de ejecución                    | `development` |
+| `APP_HOST`          | Host del servidor                       | `0.0.0.0`     |
+| `APP_PORT`          | Puerto del servidor                     | `8000`        |
 
 ---
 
@@ -170,7 +162,7 @@ cp .env.example .env
 ### Prerrequisitos
 
 - Python 3.11+
-- ffmpeg (requerido por Whisper para procesar audio)
+- ffmpeg (requerido para validación de audio)
 
 ```bash
 # Fedora
@@ -207,7 +199,7 @@ pip install -r requirements.txt
 
 ```bash
 cp .env.example .env
-# Edita .env y agrega tu API Key de Anthropic
+# Edita .env y agrega tus API Keys de Anthropic y Groq
 ```
 
 **5. Levantar el servidor**
@@ -219,7 +211,13 @@ uvicorn main:app --reload --host 0.0.0.0 --port 8000
 La API estará disponible en `http://localhost:8000`.  
 La documentación interactiva estará en `http://localhost:8000/docs`.
 
-> **Nota sobre Whisper:** al primer arranque descarga el modelo (~70 MB) y tarda ~10 segundos en cargar. Después queda en memoria. Corre en CPU sin necesidad de GPU.
+Para acceder desde el celular (misma red WiFi):
+
+```
+http://TU_IP_LOCAL:8000/docs
+```
+
+> Puedes ver tu IP local con `ip addr show` en Linux.
 
 ---
 
@@ -275,7 +273,7 @@ El técnico revisó el formulario y confirma el guardado. Se aplica automáticam
 POST /api/voz/dictar
 ```
 
-Recibe un archivo de audio (`.m4a`, `.wav`, `.mp3`, `.ogg`, `.webm`), lo transcribe con Whisper y lo interpreta con Claude:
+Recibe un archivo de audio (`.m4a`, `.wav`, `.mp3`, `.ogg`, `.webm`), lo transcribe con Groq Whisper y lo interpreta con Claude:
 
 ```json
 {
@@ -302,10 +300,10 @@ Confirma y guarda el activo dictado por voz.
 #### Sesión
 
 ```
-POST /api/sesion/iniciar       # Inicia una nueva jornada con pabellón/lab/armario
-GET  /api/sesion/contexto      # Consulta el contexto activo
-PATCH /api/sesion/contexto     # Cambia de laboratorio o armario sin iniciar nueva sesión
-POST /api/sesion/cerrar        # Cierra la sesión activa
+POST /api/sesion/iniciar        # Inicia una nueva jornada con laboratorio/armario
+GET  /api/sesion/contexto       # Consulta el contexto activo
+PATCH /api/sesion/contexto      # Cambia de laboratorio o armario sin iniciar nueva sesión
+POST /api/sesion/cerrar         # Cierra la sesión activa
 ```
 
 #### Dashboard
