@@ -1,13 +1,14 @@
 import os
 from fastapi import APIRouter, UploadFile, File, Depends, HTTPException
 from sqlite3 import Connection
+from typing import List
 
 from core.dependencies import get_db
 from schemas.voz import VozResponse
 from schemas.activo import ActivoCreate, ActivoResponse
 from services.whisper_service import transcribir
 from services.claude_service import interpretar_voz
-from services.activo_service import guardar_activo
+from services.activo_service import guardar_activo, buscar_activos
 from services.sesion_service import obtener_sesion_activa
 from utils.audio_utils import validar_audio, guardar_temp
 
@@ -15,7 +16,7 @@ router = APIRouter(prefix="/api/voz", tags=["Voz"])
 
 
 @router.post("/dictar", response_model=VozResponse)
-async def dictar(audio: UploadFile = File(...)):
+async def dictar(audio: UploadFile = File(...), conn: Connection = Depends(get_db)):
     """
     Recibe un audio, lo transcribe con Whisper y lo interpreta con Claude.
     Si es una consulta, devuelve es_consulta=True con la consulta reformulada.
@@ -38,6 +39,12 @@ async def dictar(audio: UploadFile = File(...)):
         resultado = interpretar_voz(transcripcion)
     except Exception as e:
         raise HTTPException(status_code=502, detail=f"Error al interpretar con Claude: {str(e)}")
+
+    # Si Claude detecta que es una consulta, ejecutamos la búsqueda directamente
+    if resultado.get("es_consulta"):
+        query = resultado.get("respuesta_consulta") or transcripcion
+        encontrados = buscar_activos(conn, query)
+        resultado["resultados"] = [ActivoResponse(**r) for r in encontrados]
 
     resultado["transcripcion"] = transcripcion
     return VozResponse(**resultado)

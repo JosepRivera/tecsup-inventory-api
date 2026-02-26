@@ -44,8 +44,7 @@ def eliminar_activo(conn: sqlite3.Connection, activo_id: int) -> bool:
 
 def buscar_activos(conn: sqlite3.Connection, query: str) -> List[dict]:
     """
-    Búsqueda por número de serie, nombre o modelo.
-    Stub preparado: cuando llegue GLPI, esta función puede delegar allí.
+    Búsqueda local por número de serie, nombre o modelo en SQLite.
     """
     like = f"%{query}%"
     rows = conn.execute(
@@ -59,3 +58,26 @@ def buscar_activos(conn: sqlite3.Connection, query: str) -> List[dict]:
         (like, like, like),
     ).fetchall()
     return [dict(r) for r in rows]
+
+
+def resumen_activos_sesion(conn: sqlite3.Connection, sesion_id: int) -> dict:
+    """
+    Devuelve un resumen de la sesión: total de activos y conteo por origen.
+    """
+    rows = conn.execute(
+        """
+        SELECT origen, COUNT(*) as cantidad
+        FROM activos
+        WHERE sesion_id = ?
+        GROUP BY origen
+        """,
+        (sesion_id,),
+    ).fetchall()
+
+    total = sum(r["cantidad"] for r in rows)
+    por_origen = {r["origen"] or "desconocido": r["cantidad"] for r in rows}
+
+    return {
+        "total": total,
+        "por_origen": por_origen,
+    }

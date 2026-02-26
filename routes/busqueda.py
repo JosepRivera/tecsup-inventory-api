@@ -12,8 +12,7 @@ router = APIRouter(prefix="/api/busqueda", tags=["Busqueda"])
 @router.get("/", response_model=List[ActivoResponse])
 async def buscar(q: str = Query(..., min_length=1), conn: Connection = Depends(get_db)):
     """
-    Busca activos por número de serie, nombre o modelo.
-    Stub listo para conectar con GLPI REST API en el futuro.
+    Busca activos por número de serie, nombre o modelo en la base local (SQLite).
     """
     resultados = buscar_activos(conn, q)
     return [ActivoResponse(**r) for r in resultados]
