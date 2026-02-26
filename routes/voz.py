@@ -42,7 +42,15 @@ async def dictar(audio: UploadFile = File(...), conn: Connection = Depends(get_d
 
     # Si Claude detecta que es una consulta, ejecutamos la búsqueda directamente
     if resultado.get("es_consulta"):
-        query = resultado.get("respuesta_consulta") or transcripcion
+        # Preferir un query específico si Claude lo proporciona
+        query = (
+            resultado.get("query_busqueda")
+            or resultado.get("numero_serie")
+            or resultado.get("modelo")
+            or resultado.get("nombre")
+            or resultado.get("respuesta_consulta")
+            or transcripcion
+        )
         encontrados = buscar_activos(conn, query)
         resultado["resultados"] = [ActivoResponse(**r) for r in encontrados]
 

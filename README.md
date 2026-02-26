@@ -289,6 +289,8 @@ Si el técnico dicta un **activo para registrar**, la respuesta será algo como:
   "observaciones": null,
   "es_consulta": false,
   "respuesta_consulta": null,
+  "query_busqueda": null,
+  "tipo_consulta": null,
   "resultados": null
 }
 ```
@@ -308,6 +310,8 @@ Si en cambio el audio es una **consulta** (por ejemplo: "¿dónde está la lapto
   "observaciones": null,
   "es_consulta": true,
   "respuesta_consulta": "¿Dónde se encuentra la laptop Dell del laboratorio 3?",
+  "query_busqueda": "laptop Dell laboratorio 3",
+  "tipo_consulta": "ubicacion",
   "resultados": [
     {
       "id": 42,

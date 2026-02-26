@@ -15,4 +15,6 @@ class VozResponse(BaseModel):
     observaciones: Optional[str] = None
     es_consulta: bool = False           # True si el técnico preguntó algo en vez de dictar
     respuesta_consulta: Optional[str] = None
+    query_busqueda: Optional[str] = None       # Palabras clave para búsqueda (cuando es consulta)
+    tipo_consulta: Optional[str] = None        # 'existencia' | 'ubicacion' | 'conteo' | 'otro'
     resultados: Optional[List[ActivoResponse]] = None  # Resultados de búsqueda si es_consulta=True

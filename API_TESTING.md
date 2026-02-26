@@ -162,6 +162,8 @@ La sesión define el **pabellón / laboratorio / armario** que se aplicará auto
   "observaciones": null,
   "es_consulta": false,
   "respuesta_consulta": null,
+  "query_busqueda": null,
+  "tipo_consulta": null,
   "resultados": null
 }
 ```
@@ -210,6 +212,8 @@ La sesión define el **pabellón / laboratorio / armario** que se aplicará auto
   "observaciones": null,
   "es_consulta": true,
   "respuesta_consulta": "¿Dónde se encuentra la laptop Dell del laboratorio 3?",
+  "query_busqueda": "laptop Dell laboratorio 3",
+  "tipo_consulta": "ubicacion",
   "resultados": [
     {
       "id": 42,
