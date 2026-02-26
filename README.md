@@ -113,8 +113,7 @@ tecsup-inventory-api/
 │   ├── claude_service.py            # Llamadas a Claude Vision y Claude texto
 │   ├── whisper_service.py           # Transcripción de audio con Groq Whisper API
 │   ├── sesion_service.py            # Lógica de contexto y jornada activa
-│   ├── activo_service.py            # CRUD de activos en SQLite
-│   ├── busqueda_service.py          # Búsqueda en SQLite (stub preparado para GLPI)
+│   ├── activo_service.py            # CRUD y búsqueda en SQLite
 │   ├── pdf_service.py               # Generación del PDF de resumen con ReportLab
 │   └── excel_service.py             # Generación del Excel de resumen con OpenPyXL
 │
@@ -273,7 +272,9 @@ El técnico revisó el formulario y confirma el guardado. Se aplica automáticam
 POST /api/voz/dictar
 ```
 
-Recibe un archivo de audio (`.m4a`, `.wav`, `.mp3`, `.ogg`, `.webm`), lo transcribe con Groq Whisper y lo interpreta con Claude:
+Recibe un archivo de audio (`.m4a`, `.wav`, `.mp3`, `.ogg`, `.webm`), lo transcribe con Groq Whisper y lo interpreta con Claude.
+
+Si el técnico dicta un **activo para registrar**, la respuesta será algo como:
 
 ```json
 {
@@ -287,7 +288,42 @@ Recibe un archivo de audio (`.m4a`, `.wav`, `.mp3`, `.ogg`, `.webm`), lo transcr
   "ubicacion": "Laboratorio 3",
   "observaciones": null,
   "es_consulta": false,
-  "respuesta_consulta": null
+  "respuesta_consulta": null,
+  "resultados": null
+}
+```
+
+Si en cambio el audio es una **consulta** (por ejemplo: "¿dónde está la laptop Dell del laboratorio 3?"), la API detecta que es una pregunta y ejecuta automáticamente la búsqueda en SQLite. En ese caso la respuesta será algo como:
+
+```json
+{
+  "transcripcion": "¿dónde está la laptop Dell del laboratorio 3?",
+  "nombre": null,
+  "marca": null,
+  "modelo": null,
+  "tipo": null,
+  "numero_serie": null,
+  "estado": null,
+  "ubicacion": null,
+  "observaciones": null,
+  "es_consulta": true,
+  "respuesta_consulta": "¿Dónde se encuentra la laptop Dell del laboratorio 3?",
+  "resultados": [
+    {
+      "id": 42,
+      "nombre": "Dell Latitude 5420",
+      "marca": "Dell",
+      "modelo": "Latitude 5420",
+      "tipo": "Laptop",
+      "numero_serie": "ABC123",
+      "estado": "Bueno",
+      "ubicacion": "Pabellón A / Lab 3 / Armario 1",
+      "observaciones": null,
+      "sesion_id": 7,
+      "origen": "voz",
+      "creado_en": "2025-02-10T10:15:00"
+    }
+  ]
 }
 ```
 
@@ -310,6 +346,7 @@ POST /api/sesion/cerrar         # Cierra la sesión activa
 
 ```
 GET    /api/dashboard/activos           # Lista todos los activos de la sesión activa
+GET    /api/dashboard/resumen           # Resumen de la sesión: total y conteo por origen (ocr, voz, manual)
 DELETE /api/dashboard/activos/{id}      # Deshace un registro (elimina de SQLite)
 ```
 

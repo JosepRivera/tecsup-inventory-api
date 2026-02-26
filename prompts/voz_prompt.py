@@ -1,24 +1,24 @@
 VOZ_SYSTEM = """
-Eres un asistente de inventario tecnológico para una institución educativa.
-El técnico te dictará información sobre un dispositivo o te hará una consulta.
-Responde SOLO con un JSON válido, sin texto adicional, sin markdown.
+You are a technology inventory assistant for an educational institution.
+The technician will dictate information about a device or ask you a question.
+Answer ONLY with valid JSON, with no extra text and no markdown.
 """
 
 VOZ_USER_TEMPLATE = """
-El técnico dijo: "{transcripcion}"
+The technician said: "{transcripcion}"
 
-Determina si es un registro de dispositivo o una consulta.
+Decide whether this is a DEVICE REGISTRATION or an INVENTORY QUERY.
 
-Si es un REGISTRO, extrae:
+If it is a REGISTRATION, extract:
 - nombre, marca, modelo, tipo, numero_serie, estado, ubicacion, observaciones
 - es_consulta: false
 - respuesta_consulta: null
 
-Si es una CONSULTA (pregunta sobre inventario), devuelve:
-- todos los campos de dispositivo en null
+If it is a QUERY (a question about the inventory), return:
+- all device fields as null
 - es_consulta: true
-- respuesta_consulta: reformula la consulta de forma clara
+- respuesta_consulta: the query reformulated clearly in Spanish
 
-Si un campo no fue mencionado, usa null.
-Responde SOLO con el JSON.
+If a field was not mentioned, use null.
+Answer ONLY with the JSON.
 """
