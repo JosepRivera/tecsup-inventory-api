@@ -77,11 +77,11 @@ Construida con **FastAPI**, **Claude Vision (Haiku)** y **Groq Whisper API**, pr
 | ----------------------------------------------------------------------------------------------- | --------------------------- |
 | **OCR de etiquetas** — Foto → preprocesamiento → JSON estructurado con Claude Vision            | ✅ Listo                     |
 | **Dictado de voz** — Audio → Groq Whisper → Claude → JSON de inventario                         | ✅ Listo                     |
-| **Contexto de sesión** — Laboratorio/armario aplicado automáticamente a cada activo             | ✅ Listo                     |
-| **Dashboard de sesión** — Listado en tiempo real de activos registrados, con opción de deshacer | ✅ Listo                     |
-| **Búsqueda rápida** — Buscar activos por nombre, modelo o número de serie                       | ✅ Listo                     |
-| **Exportar PDF** — Resumen de jornada con tabla de activos y estadísticas por origen            | ✅ Listo                     |
-| **Exportar Excel** — Dos hojas: resumen de jornada y tabla completa con autofilter              | ✅ Listo                     |
+| **Contexto de sesión** — Soporte multi-usuario con técnico asignado, pabellón/laboratorio/armario automatizado | ✅ Listo                     |
+| **Dashboard de sesión** — Listado filtrado por técnico en tiempo real, con opción de deshacer | ✅ Listo                     |
+| **Búsqueda rápida** — Buscar activos por nombre, modelo o número de serie con paginación | ✅ Listo                     |
+| **Exportar PDF/Excel Sesión** — Reporte con columna de Técnico responsable y estadísticas | ✅ Listo                     |
+| **Exportar PDF/Excel Global** — Reporte consolidado de todo el inventario con trazabilidad por técnico | ✅ Listo                     |
 
 ---
 
@@ -229,6 +229,24 @@ http://TU_IP_LOCAL:8000/docs
 
 ---
 
+## Mantenimiento y Reset
+
+Si deseas limpiar todos los datos y volver a cargar el seeder de prueba:
+
+**1. Borrar la base de datos actual**
+```bash
+rm database.db
+```
+
+**2. Ejecutar el seeder**
+```bash
+python scripts/seed_db.py
+```
+
+Esto recreará las tablas y poblará el sistema con datos de prueba realistas (técnicos, dispositivos de Tecsup, etc.).
+
+---
+
 ## Documentación API
 
 Una vez levantado el servidor, la documentación interactiva estará disponible en:
@@ -340,10 +358,10 @@ Confirma y guarda el activo dictado por voz.
 #### Sesión
 
 ```
-POST /api/sesion/iniciar        # Inicia una nueva jornada con laboratorio/armario
-GET  /api/sesion/contexto       # Consulta el contexto activo
-PATCH /api/sesion/contexto      # Cambia de laboratorio o armario sin iniciar nueva sesión
-POST /api/sesion/cerrar         # Cierra la sesión activa
+POST /api/sesion/iniciar        # Inicia jornada (requiere "tecnico", "pabellon", "laboratorio")
+GET  /api/sesion/contexto       # Consulta el contexto (usa header X-Tecnico)
+PATCH /api/sesion/contexto      # Actualiza ubicación (usa header X-Tecnico)
+POST /api/sesion/cerrar         # Cierra sesión (usa header X-Tecnico)
 ```
 
 #### Dashboard
@@ -357,14 +375,16 @@ DELETE /api/dashboard/activos/{id}      # Deshace un registro (elimina de SQLite
 #### Búsqueda
 
 ```
-GET /api/busqueda?q={término}   # Busca por nombre, modelo o número de serie
+GET /api/busqueda?q={término}&p=1&size=20   # Busca por nombre, modelo o número de serie con paginación
 ```
 
 #### Exportación
 
 ```
-GET /api/exportar/pdf     # Descarga PDF de resumen de la sesión activa
-GET /api/exportar/excel   # Descarga Excel con dos hojas: resumen y tabla de activos
+GET /api/exportar/pdf           # Descarga PDF de resumen de la sesión activa
+GET /api/exportar/excel         # Descarga Excel de la sesión activa
+GET /api/exportar/global/pdf    # Descarga PDF de todo el inventario histórico
+GET /api/exportar/global/excel  # Descarga Excel de todo el inventario histórico
 ```
 
 ---

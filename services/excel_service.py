@@ -1,5 +1,6 @@
 import os
 from datetime import datetime
+from utils.date_utils import get_now_lima
 from openpyxl import Workbook
 from openpyxl.styles import (
     Font, PatternFill, Alignment, Border, Side, GradientFill
@@ -22,15 +23,17 @@ def _borde_medio():
     return Border(left=lado, right=lado, top=lado, bottom=lado)
 
 
-def generar_excel_sesion(activos: list, sesion: dict) -> str:
+def generar_excel_sesion(activos: list, sesion: dict = None) -> str:
     """
-    Genera el Excel de resumen de sesión y lo guarda en exports/.
+    Genera el Excel de resumen (de sesión o global) y lo guarda en exports/.
     Retorna la ruta del archivo generado.
     """
     os.makedirs(EXPORTS_DIR, exist_ok=True)
 
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    nombre_archivo = f"sesion_{sesion.get('id', 'x')}_{timestamp}.xlsx"
+    now = get_now_lima()
+    timestamp = now.strftime("%Y%m%d_%H%M%S")
+    prefijo = f"sesion_{sesion.get('id', 'x')}" if sesion else "inventario_global"
+    nombre_archivo = f"{prefijo}_{timestamp}.xlsx"
     ruta = os.path.join(EXPORTS_DIR, nombre_archivo)
 
     wb = Workbook()
@@ -66,7 +69,7 @@ def _hoja_resumen(wb: Workbook, activos: list, sesion: dict):
     ws.row_dimensions[1].height = 30
 
     ws.merge_cells("A2:B2")
-    ws["A2"] = "Resumen de Sesión de Inventariado"
+    ws["A2"] = f"Resumen de {'Sesión de Inventariado' if sesion else 'Inventario Global'}"
     ws["A2"].font = Font(name="Calibri", color="888888", size=10, italic=True)
     ws["A2"].fill = fill_header
     ws["A2"].alignment = alineado_c
@@ -75,22 +78,28 @@ def _hoja_resumen(wb: Workbook, activos: list, sesion: dict):
     # Separador
     ws.row_dimensions[3].height = 8
 
-    ubicacion = " / ".join(filter(None, [
-        sesion.get("pabellon"),
-        sesion.get("laboratorio"),
-        sesion.get("armario"),
-    ])) or "No especificada"
-
-    fecha = (sesion.get("creada_en") or "")[:10]
+    if sesion:
+        ubicacion = " / ".join(filter(None, [
+            sesion.get("pabellon"),
+            sesion.get("laboratorio"),
+            sesion.get("armario"),
+        ])) or "No especificada"
+        fecha = (sesion.get("creada_en") or "")[:10]
+        alcance_label = "Ubicación"
+    else:
+        ubicacion = "Inventario Completo (Todo el campus)"
+        fecha = get_now_lima().strftime("%Y-%m-%d")
+        alcance_label = "Alcance"
 
     datos = [
-        ("Ubicación", ubicacion),
-        ("Fecha de jornada", fecha),
+        ("Técnico Responsable", sesion.get("tecnico") or "N/A") if sesion else ("Generado por", "Sistema Inventario"),
+        (alcance_label, ubicacion),
+        ("Fecha de corte", fecha),
         ("Total de activos registrados", str(len(activos))),
         ("Registrados por OCR", str(sum(1 for a in activos if a.get("origen") == "ocr"))),
         ("Registrados por voz", str(sum(1 for a in activos if a.get("origen") == "voz"))),
         ("Registrados manualmente", str(sum(1 for a in activos if a.get("origen") == "manual"))),
-        ("Documento generado", datetime.now().strftime("%d/%m/%Y %H:%M:%S")),
+        ("Documento generado", get_now_lima().strftime("%d/%m/%Y %H:%M:%S")),
     ]
 
     for i, (label, valor) in enumerate(datos, start=4):
@@ -124,6 +133,7 @@ def _hoja_activos(wb: Workbook, activos: list):
         ("N° Serie",    18),
         ("Estado",      12),
         ("Ubicación",   22),
+        ("Técnico",     20),
         ("Origen",      10),
         ("Registrado",  18),
     ]
@@ -158,6 +168,7 @@ def _hoja_activos(wb: Workbook, activos: list):
             activo.get("numero_serie") or "",
             activo.get("estado") or "",
             activo.get("ubicacion") or "",
+            activo.get("tecnico") or "",
             activo.get("origen") or "",
             (activo.get("creado_en") or "")[:16],
         ]

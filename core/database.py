@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS activos (
 CREATE_SESIONES = """
 CREATE TABLE IF NOT EXISTS sesiones (
     id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    tecnico     TEXT,
     pabellon    TEXT,
     laboratorio TEXT,
     armario     TEXT,

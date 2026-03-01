@@ -7,7 +7,7 @@ from core.dependencies import get_db
 from services.pdf_service import generar_pdf_sesion
 from services.excel_service import generar_excel_sesion
 from services.sesion_service import obtener_sesion_activa
-from services.activo_service import listar_activos_sesion
+from services.activo_service import listar_activos_sesion, listar_todos_los_activos
 
 router = APIRouter(prefix="/api/exportar", tags=["Exportar"])
 
@@ -40,6 +40,28 @@ async def exportar_excel(conn: Connection = Depends(get_db)):
     activos = listar_activos_sesion(conn, sesion["id"])
     ruta = generar_excel_sesion(activos, sesion)
 
+    return FileResponse(
+        path=ruta,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        filename=os.path.basename(ruta),
+    )
+
+@router.get("/global/pdf")
+async def exportar_pdf_global(conn: Connection = Depends(get_db)):
+    """Genera y descarga el PDF de todo el inventario."""
+    activos = listar_todos_los_activos(conn)
+    ruta = generar_pdf_sesion(activos, sesion=None)
+    return FileResponse(
+        path=ruta,
+        media_type="application/pdf",
+        filename=os.path.basename(ruta),
+    )
+
+@router.get("/global/excel")
+async def exportar_excel_global(conn: Connection = Depends(get_db)):
+    """Genera y descarga el Excel de todo el inventario."""
+    activos = listar_todos_los_activos(conn)
+    ruta = generar_excel_sesion(activos, sesion=None)
     return FileResponse(
         path=ruta,
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",

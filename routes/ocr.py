@@ -1,7 +1,7 @@
 from fastapi import APIRouter, UploadFile, File, Depends, HTTPException
 from sqlite3 import Connection
 
-from core.dependencies import get_db
+from core.dependencies import get_db, get_tecnico
 from schemas.ocr import OCRResponse
 from schemas.activo import ActivoCreate, ActivoResponse
 from services.claude_service import analizar_etiqueta
@@ -33,12 +33,16 @@ async def escanear_etiqueta(imagen: UploadFile = File(...)):
 
 
 @router.post("/confirmar", response_model=ActivoResponse)
-async def confirmar_activo(activo: ActivoCreate, conn: Connection = Depends(get_db)):
+async def confirmar_activo(
+    activo: ActivoCreate, 
+    conn: Connection = Depends(get_db),
+    tecnico: str = Depends(get_tecnico)
+):
     """
     El técnico revisó el formulario prellenado y confirma el guardado.
-    Se aplica el contexto de la sesión activa si existe.
+    Se aplica el contexto de la sesión activa del técnico si existe.
     """
-    sesion = obtener_sesion_activa(conn)
+    sesion = obtener_sesion_activa(conn, tecnico)
     datos = activo.model_dump()
 
     # Aplicar ubicación de la sesión si el activo no tiene una propia

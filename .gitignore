@@ -26,3 +26,5 @@ exports/
 # Editor
 .vscode/
 .idea/
+
+*.pem

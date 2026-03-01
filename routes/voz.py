@@ -3,7 +3,7 @@ from fastapi import APIRouter, UploadFile, File, Depends, HTTPException
 from sqlite3 import Connection
 from typing import List
 
-from core.dependencies import get_db
+from core.dependencies import get_db, get_tecnico
 from schemas.voz import VozResponse
 from schemas.activo import ActivoCreate, ActivoResponse
 from services.whisper_service import transcribir
@@ -59,11 +59,15 @@ async def dictar(audio: UploadFile = File(...), conn: Connection = Depends(get_d
 
 
 @router.post("/confirmar", response_model=ActivoResponse)
-async def confirmar_voz(activo: ActivoCreate, conn: Connection = Depends(get_db)):
+async def confirmar_voz(
+    activo: ActivoCreate, 
+    conn: Connection = Depends(get_db),
+    tecnico: str = Depends(get_tecnico)
+):
     """
-    El técnico confirma el activo dictado por voz para guardarlo.
+    El técnico confirma el activo dictado por voz para guardarlo en su sesión.
     """
-    sesion = obtener_sesion_activa(conn)
+    sesion = obtener_sesion_activa(conn, tecnico)
     datos = activo.model_dump()
 
     if sesion and not datos.get("ubicacion"):

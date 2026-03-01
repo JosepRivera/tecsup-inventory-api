@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from core.config import settings
 from core.database import init_db
-from routes import ocr, voz, sesion, dashboard, busqueda, exportar
+from routes import ocr, voz, sesion, dashboard, busqueda, exportar, activos
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
@@ -25,7 +25,7 @@ app.add_middleware(
     allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["*"],
+    allow_headers=["*", "X-Tecnico"],
 )
 
 # Routers
@@ -35,6 +35,7 @@ app.include_router(sesion.router)
 app.include_router(dashboard.router)
 app.include_router(busqueda.router)
 app.include_router(exportar.router)
+app.include_router(activos.router)
 
 @app.get("/")
 def root():

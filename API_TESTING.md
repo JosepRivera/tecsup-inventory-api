@@ -16,6 +16,21 @@ uvicorn main:app --reload --host 0.0.0.0 --port 8000
 
 ---
 
+## 0. Reset de Base de Datos (Limpieza)
+
+Si quieres empezar las pruebas desde cero:
+
+1. Detén el servidor (`CTRL+C`).
+2. Borra el archivo: `rm database.db`.
+3. (Opcional) Carga datos de prueba: `python scripts/seed_db.py`.
+4. Inicia el servidor de nuevo.
+
+---
+> [!IMPORTANT]
+> **Identificación de Técnico:** Para que la API diferencie entre usuarios, todas las peticiones (excepto inicio de sesión y exportación global) deben incluir el header `X-Tecnico` con el nombre del técnico.
+
+---
+
 ## 1. Flujo de sesión (contexto de jornada)
 
 La sesión define el **pabellón / laboratorio / armario** que se aplicará automáticamente a los activos registrados.
@@ -28,6 +43,7 @@ La sesión define el **pabellón / laboratorio / armario** que se aplicará auto
 
 ```json
 {
+  "tecnico": "Kevin Rivera",
   "pabellon": "Pabellón A",
   "laboratorio": "Lab 3",
   "armario": "Armario 1"
@@ -43,7 +59,8 @@ La sesión define el **pabellón / laboratorio / armario** que se aplicará auto
 
 - Endpoint: `GET /api/sesion/contexto`
 - Simplemente pulsa **Execute**.
-- Debe devolver la misma información de la sesión activa.
+- **Nota:** Asegúrate de que el header `X-Tecnico` coincida con el nombre usado al iniciar sesión. La API normaliza el texto (quita espacios, capitaliza), por lo que "kevin" y "Kevin" se consideran el mismo.
+- Debe devolver la información de la sesión activa del técnico especificado.
 - Si no hay sesión activa, devolverá `404`.
 
 ### 1.3 Actualizar contexto sin cerrar sesión
@@ -225,6 +242,7 @@ La sesión define el **pabellón / laboratorio / armario** que se aplicará auto
       "estado": "Bueno",
       "ubicacion": "Pabellón A / Lab 3 / Armario 1",
       "observaciones": null,
+      "tecnico": "Kevin Rivera",
       "sesion_id": 7,
       "origen": "voz",
       "creado_en": "2025-02-10T10:15:00"
@@ -286,11 +304,12 @@ La sesión define el **pabellón / laboratorio / armario** que se aplicará auto
 
 - Endpoint: `GET /api/busqueda`
 - En `/docs`:
-  - Parámetro `q` (obligatorio, mínimo 1 carácter).
+  - Parámetros:
+    - `q` (obligatorio, mínimo 1 carácter).
+    - `p` (opcional, default 1): Número de página.
+    - `size` (opcional, default 50): Cantidad de resultados.
   - Ejemplos:
-    - `q = "Latitude"`
-    - `q = "ABC123"`
-    - `q = "Monitor"`
+    - `q = "Latitude"&p=1&size=5`
 - Respuesta:
   - Lista de activos que coinciden parcialment por `nombre`, `modelo` o `numero_serie`.
 
@@ -315,6 +334,12 @@ Requieren sesión activa y al menos un activo registrado.
 - La respuesta será un archivo `.xlsx` con:
   - Hoja 1: resumen de jornada.
   - Hoja 2: tabla completa de activos con autofiltro.
+
+### 6.3 Exportar Inventario Total (Global)
+
+- Endpoint: `GET /api/exportar/global/pdf`
+- Endpoint: `GET /api/exportar/global/excel`
+- **No requieren sesión activa**. Generan el reporte consolidado de todos los equipos registrados en la base de datos histórica.
 
 ---
 
