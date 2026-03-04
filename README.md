@@ -17,26 +17,22 @@ Escanea etiquetas con la cámara del celular y registra en el sistema con IA.
 
 ## Tabla de Contenidos
 
-- [Tecsup Inventory API](#tecsup-inventory-api)
-  - [Tabla de Contenidos](#tabla-de-contenidos)
-  - [Descripción](#descripción)
-  - [Tech Stack](#tech-stack)
-  - [Funcionalidades](#funcionalidades)
-  - [Arquitectura del Proyecto](#arquitectura-del-proyecto)
-  - [Variables de Entorno](#variables-de-entorno)
-  - [Instalación y Setup](#instalación-y-setup)
-    - [Prerrequisitos](#prerrequisitos)
-    - [Pasos](#pasos)
-  - [Comandos Disponibles](#comandos-disponibles)
-  - [Documentación API](#documentación-api)
-    - [Endpoints principales](#endpoints-principales)
-      - [OCR de etiquetas](#ocr-de-etiquetas)
-      - [Dictado de voz](#dictado-de-voz)
-      - [Sesión](#sesión)
-      - [Dashboard](#dashboard)
-      - [Búsqueda](#búsqueda)
-      - [Exportación](#exportación)
-  - [Licencia](#licencia)
+- [Descripción](#descripción)
+- [Tech Stack](#tech-stack)
+- [Funcionalidades](#funcionalidades)
+- [Arquitectura del Proyecto](#arquitectura-del-proyecto)
+- [Variables de Entorno](#variables-de-entorno)
+- [Instalación y Setup](#instalación-y-setup)
+- [Comandos Disponibles](#comandos-disponibles)
+- [Documentación API](#documentación-api)
+  - [OCR de etiquetas](#ocr-de-etiquetas)
+  - [Dictado de voz](#dictado-de-voz)
+  - [Sesión](#sesión)
+  - [Dashboard y Estadísticas](#dashboard-y-estadísticas)
+  - [Gestión de Activos (CRUD)](#gestión-de-activos-crud)
+  - [Búsqueda](#búsqueda)
+  - [Exportación](#exportación)
+- [Licencia](#licencia)
 
 ---
 
@@ -44,7 +40,7 @@ Escanea etiquetas con la cámara del celular y registra en el sistema con IA.
 
 **Tecsup Inventory API** es el backend de un sistema de inventariado de dispositivos tecnológicos desarrollado como proyecto de pasantía en **Tecsup**.
 
-El problema que resuelve: inventariar manualmente ~5000 equipos distribuidos en más de 20 laboratorios es un proceso lento y propenso a errores. Esta API permite que un técnico tome una foto de la etiqueta de cualquier dispositivo con su celular y obtenga automáticamente los datos estructurados (marca, modelo, número de serie, etc.) listos para registrar en el sistema. Alternativamente, puede dictar la información por voz y el sistema la interpreta y estructura automáticamente.
+El problema que resuelve: inventariar manualmente ~5000 equipos distribuidos en más de 20 laboratorios es un proceso lento y propenso a errores. Esta API permite que un técnico tome una foto de la etiqueta de cualquier dispositivo con su celular y obtenga automáticamente los datos estructurados (marca, modelo, número de serie, etc.) listos para registrar en el sistema. Alternativamente, puede dictar la información por voz — o incluso hacer consultas en lenguaje natural como *"¿dónde está la laptop Dell del laboratorio 3?"* — y el sistema interpreta, estructura y responde automáticamente.
 
 Construida con **FastAPI**, **Claude Vision (Haiku)** y **Groq Whisper API**, procesa imágenes y audio en tiempo real con alta precisión incluso en condiciones de poca iluminación.
 
@@ -73,15 +69,18 @@ Construida con **FastAPI**, **Claude Vision (Haiku)** y **Groq Whisper API**, pr
 
 ## Funcionalidades
 
-| Módulo                                                                                          | Estado                      |
-| ----------------------------------------------------------------------------------------------- | --------------------------- |
-| **OCR de etiquetas** — Foto → preprocesamiento → JSON estructurado con Claude Vision            | ✅ Listo                     |
-| **Dictado de voz** — Audio → Groq Whisper → Claude → JSON de inventario                         | ✅ Listo                     |
-| **Contexto de sesión** — Soporte multi-usuario con técnico asignado, pabellón/laboratorio/armario automatizado | ✅ Listo                     |
-| **Dashboard de sesión** — Listado filtrado por técnico en tiempo real, con opción de deshacer | ✅ Listo                     |
-| **Búsqueda rápida** — Buscar activos por nombre, modelo o número de serie con paginación | ✅ Listo                     |
-| **Exportar PDF/Excel Sesión** — Reporte con columna de Técnico responsable y estadísticas | ✅ Listo                     |
-| **Exportar PDF/Excel Global** — Reporte consolidado de todo el inventario con trazabilidad por técnico | ✅ Listo                     |
+| Módulo | Descripción | Estado |
+| --- | --- | --- |
+| **OCR de etiquetas** | Foto → preprocesamiento → JSON estructurado con Claude Vision | ✅ Listo |
+| **Dictado de voz** | Audio → Groq Whisper → Claude → JSON de inventario | ✅ Listo |
+| **Consultas por voz** | Lenguaje natural → búsqueda automática en inventario | ✅ Listo |
+| **Contexto de sesión** | Multi-técnico con pabellón/laboratorio/armario automatizado | ✅ Listo |
+| **Dashboard de sesión** | Listado de activos del técnico en tiempo real, con opción de deshacer | ✅ Listo |
+| **Estadísticas globales** | Resumen general, conteo por tipo y por estado del inventario completo | ✅ Listo |
+| **Gestión de activos (CRUD)** | Listar, obtener, actualizar y eliminar activos del inventario histórico | ✅ Listo |
+| **Búsqueda rápida** | Buscar activos por nombre, modelo o número de serie con paginación | ✅ Listo |
+| **Exportar PDF/Excel sesión** | Reporte de la jornada activa con tabla de activos por técnico | ✅ Listo |
+| **Exportar PDF/Excel global** | Reporte consolidado de todo el inventario histórico | ✅ Listo |
 
 ---
 
@@ -99,23 +98,25 @@ tecsup-inventory-api/
 ├── core/
 │   ├── config.py                    # Carga de variables de entorno con pydantic-settings
 │   ├── database.py                  # Conexión SQLite y creación de tablas
-│   └── dependencies.py              # Dependencias reutilizables de FastAPI
+│   └── dependencies.py              # Dependencias reutilizables de FastAPI (get_db, get_tecnico)
 │
 ├── routes/
 │   ├── ocr.py                       # POST /api/ocr/escanear-etiqueta y /confirmar
 │   ├── voz.py                       # POST /api/voz/dictar y /confirmar
 │   ├── sesion.py                    # GET/POST/PATCH /api/sesion/contexto
-│   ├── dashboard.py                 # GET /api/dashboard/activos
+│   ├── dashboard.py                 # GET /api/dashboard/activos, /resumen, /estadisticas/*
+│   ├── activos.py                   # GET/PATCH/DELETE /api/activos (CRUD histórico)
 │   ├── busqueda.py                  # GET /api/busqueda?q=...
-│   └── exportar.py                  # GET /api/exportar/pdf y /excel
+│   └── exportar.py                  # GET /api/exportar/pdf, /excel, /global/*
 │
 ├── services/
 │   ├── claude_service.py            # Llamadas a Claude Vision y Claude texto
 │   ├── whisper_service.py           # Transcripción de audio con Groq Whisper API
 │   ├── sesion_service.py            # Lógica de contexto y jornada activa
 │   ├── activo_service.py            # CRUD y búsqueda en SQLite
-│   ├── pdf_service.py               # Generación del PDF de resumen con ReportLab
-│   └── excel_service.py             # Generación del Excel de resumen con OpenPyXL
+│   ├── estadistica_service.py       # Consultas de estadísticas globales
+│   ├── pdf_service.py               # Generación del PDF con ReportLab
+│   └── excel_service.py             # Generación del Excel con OpenPyXL
 │
 ├── models/
 │   ├── activo.py                    # Modelo SQLite del activo
@@ -131,9 +132,12 @@ tecsup-inventory-api/
 │   ├── ocr_prompt.py                # Prompt estructurado para Claude Vision
 │   └── voz_prompt.py                # Prompt estructurado para Claude texto
 │
-└── utils/
-    ├── image_utils.py               # Preprocesamiento de imagen (resize)
-    └── audio_utils.py               # Validación de formato de audio
+├── utils/
+│   ├── image_utils.py               # Preprocesamiento de imagen (resize, validación)
+│   └── audio_utils.py               # Validación de formato de audio y guardado temporal
+│
+└── scripts/
+    └── seed_db.py                   # Script para poblar la base de datos con datos de prueba
 ```
 
 ---
@@ -222,10 +226,11 @@ http://TU_IP_LOCAL:8000/docs
 
 ## Comandos Disponibles
 
-| Comando                                       | Descripción                                             |
-| --------------------------------------------- | ------------------------------------------------------- |
-| `uvicorn main:app --reload`                   | Servidor en modo desarrollo con hot-reload              |
+| Comando | Descripción |
+| ----------------------------------------------- | ------------------------------------------------------- |
+| `uvicorn main:app --reload` | Servidor en modo desarrollo con hot-reload |
 | `uvicorn main:app --host 0.0.0.0 --port 8000` | Servidor accesible desde la red local (para el celular) |
+| `python scripts/seed_db.py` | Pobla la base de datos con datos de prueba |
 
 ---
 
@@ -255,15 +260,17 @@ Una vez levantado el servidor, la documentación interactiva estará disponible 
 http://localhost:8000/docs
 ```
 
-### Endpoints principales
+> **Identificación de Técnico:** Todas las peticiones (excepto inicio de sesión y exportación global) deben incluir el header `X-Tecnico` con el nombre del técnico.
 
-#### OCR de etiquetas
+---
+
+### OCR de etiquetas
 
 ```
 POST /api/ocr/escanear-etiqueta
 ```
 
-Recibe una foto de etiqueta y devuelve los datos del dispositivo en JSON:
+Recibe una foto de etiqueta (`.jpg`, `.jpeg`, `.png`, `.webp`, `.heic`) y devuelve los datos del dispositivo en JSON usando Claude Vision:
 
 ```json
 {
@@ -282,17 +289,19 @@ Recibe una foto de etiqueta y devuelve los datos del dispositivo en JSON:
 POST /api/ocr/confirmar
 ```
 
-El técnico revisó el formulario y confirma el guardado. Se aplica automáticamente el contexto de sesión activa.
+El técnico revisó el formulario y confirma el guardado. Se aplica automáticamente el contexto de sesión activa (ubicación, `sesion_id`) y se marca `origen = "ocr"`.
 
-#### Dictado de voz
+---
+
+### Dictado de voz
 
 ```
 POST /api/voz/dictar
 ```
 
-Recibe un archivo de audio (`.m4a`, `.wav`, `.mp3`, `.ogg`, `.webm`), lo transcribe con Groq Whisper y lo interpreta con Claude.
+Recibe un archivo de audio (`.m4a`, `.wav`, `.mp3`, `.ogg`, `.webm`), lo transcribe con **Groq Whisper** y lo interpreta con **Claude**. El sistema distingue automáticamente dos tipos de intención:
 
-Si el técnico dicta un **activo para registrar**, la respuesta será algo como:
+**Caso 1 — Registro de activo:**
 
 ```json
 {
@@ -313,19 +322,11 @@ Si el técnico dicta un **activo para registrar**, la respuesta será algo como:
 }
 ```
 
-Si en cambio el audio es una **consulta** (por ejemplo: "¿dónde está la laptop Dell del laboratorio 3?"), la API detecta que es una pregunta y ejecuta automáticamente la búsqueda en SQLite. En ese caso la respuesta será algo como:
+**Caso 2 — Consulta en lenguaje natural** (búsqueda automática ejecutada por el backend):
 
 ```json
 {
   "transcripcion": "¿dónde está la laptop Dell del laboratorio 3?",
-  "nombre": null,
-  "marca": null,
-  "modelo": null,
-  "tipo": null,
-  "numero_serie": null,
-  "estado": null,
-  "ubicacion": null,
-  "observaciones": null,
   "es_consulta": true,
   "respuesta_consulta": "¿Dónde se encuentra la laptop Dell del laboratorio 3?",
   "query_busqueda": "laptop Dell laboratorio 3",
@@ -340,7 +341,6 @@ Si en cambio el audio es una **consulta** (por ejemplo: "¿dónde está la lapto
       "numero_serie": "ABC123",
       "estado": "Bueno",
       "ubicacion": "Pabellón A / Lab 3 / Armario 1",
-      "observaciones": null,
       "sesion_id": 7,
       "origen": "voz",
       "creado_en": "2025-02-10T10:15:00"
@@ -353,39 +353,99 @@ Si en cambio el audio es una **consulta** (por ejemplo: "¿dónde está la lapto
 POST /api/voz/confirmar
 ```
 
-Confirma y guarda el activo dictado por voz.
+Confirma y guarda el activo dictado por voz, aplicando el contexto de sesión activa.
 
-#### Sesión
+---
 
-```
-POST /api/sesion/iniciar        # Inicia jornada (requiere "tecnico", "pabellon", "laboratorio")
-GET  /api/sesion/contexto       # Consulta el contexto (usa header X-Tecnico)
-PATCH /api/sesion/contexto      # Actualiza ubicación (usa header X-Tecnico)
-POST /api/sesion/cerrar         # Cierra sesión (usa header X-Tecnico)
-```
+### Sesión
 
-#### Dashboard
+La sesión define el **pabellón / laboratorio / armario** que se aplica automáticamente a todos los activos registrados por el técnico.
 
 ```
-GET    /api/dashboard/activos           # Lista todos los activos de la sesión activa
-GET    /api/dashboard/resumen           # Resumen de la sesión: total y conteo por origen (ocr, voz, manual)
-DELETE /api/dashboard/activos/{id}      # Deshace un registro (elimina de SQLite)
+POST  /api/sesion/iniciar     # Inicia una jornada de trabajo
+GET   /api/sesion/contexto    # Consulta la sesión activa del técnico (X-Tecnico)
+PATCH /api/sesion/contexto    # Actualiza la ubicación sin cerrar sesión (X-Tecnico)
+POST  /api/sesion/cerrar      # Cierra la sesión activa (X-Tecnico)
 ```
 
-#### Búsqueda
+**Body de inicio de sesión:**
+```json
+{
+  "tecnico": "Kevin Rivera",
+  "pabellon": "Pabellón A",
+  "laboratorio": "Lab 3",
+  "armario": "Armario 1"
+}
+```
+
+---
+
+### Dashboard y Estadísticas
+
+#### Activos de la sesión activa
 
 ```
-GET /api/busqueda?q={término}&p=1&size=20   # Busca por nombre, modelo o número de serie con paginación
+GET    /api/dashboard/activos          # Lista los activos registrados en la sesión activa
+GET    /api/dashboard/resumen          # Total y conteo por origen (ocr, voz, manual)
+DELETE /api/dashboard/activos/{id}     # Deshace un registro (undo)
 ```
 
-#### Exportación
+**Ejemplo de respuesta del resumen:**
+```json
+{
+  "total": 15,
+  "por_origen": {
+    "ocr": 8,
+    "voz": 5,
+    "manual": 2
+  }
+}
+```
+
+#### Estadísticas globales del inventario
 
 ```
-GET /api/exportar/pdf           # Descarga PDF de resumen de la sesión activa
-GET /api/exportar/excel         # Descarga Excel de la sesión activa
-GET /api/exportar/global/pdf    # Descarga PDF de todo el inventario histórico
-GET /api/exportar/global/excel  # Descarga Excel de todo el inventario histórico
+GET /api/dashboard/estadisticas/global   # Resumen general de todos los activos históricos
+GET /api/dashboard/estadisticas/tipo     # Conteo de activos agrupados por tipo
+GET /api/dashboard/estadisticas/estado   # Conteo de activos agrupados por estado
 ```
+
+---
+
+### Gestión de Activos (CRUD)
+
+Endpoints para gestionar el inventario histórico completo, independientemente de la sesión activa:
+
+```
+GET    /api/activos?p=1&size=50    # Lista todos los activos con paginación
+GET    /api/activos/{id}           # Obtiene un activo por su ID
+PATCH  /api/activos/{id}           # Actualiza los datos de un activo
+DELETE /api/activos/{id}           # Elimina permanentemente un activo
+```
+
+---
+
+### Búsqueda
+
+```
+GET /api/busqueda?q={término}&p=1&size=20
+```
+
+Busca activos en el inventario completo por coincidencia parcial en `nombre`, `modelo` o `numero_serie`. Soporta paginación.
+
+---
+
+### Exportación
+
+```
+GET /api/exportar/pdf             # PDF de la sesión activa del técnico
+GET /api/exportar/excel           # Excel de la sesión activa del técnico
+GET /api/exportar/global/pdf      # PDF de todo el inventario histórico
+GET /api/exportar/global/excel    # Excel de todo el inventario histórico
+```
+
+Los reportes de sesión incluyen: resumen de jornada, tabla de activos y estadísticas por origen.  
+Los reportes globales consolidan todos los equipos registrados con trazabilidad por técnico.
 
 ---
 
