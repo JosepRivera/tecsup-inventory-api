@@ -32,6 +32,7 @@ Escanea etiquetas con la cámara del celular y registra en el sistema con IA.
   - [Gestión de Activos (CRUD)](#gestión-de-activos-crud)
   - [Búsqueda](#búsqueda)
   - [Exportación](#exportación)
+- [Pruebas (Testing)](#pruebas-testing)
 - [Licencia](#licencia)
 
 ---
@@ -446,6 +447,34 @@ GET /api/exportar/global/excel    # Excel de todo el inventario histórico
 
 Los reportes de sesión incluyen: resumen de jornada, tabla de activos y estadísticas por origen.  
 Los reportes globales consolidan todos los equipos registrados con trazabilidad por técnico.
+
+---
+
+## Pruebas (Testing)
+
+El proyecto cuenta con una suite de pruebas automatizadas para asegurar la estabilidad del core.
+
+### Documentación de Pruebas
+- [Plan de Pruebas](./plan_de_pruebas.md)
+- [Casos de Prueba](./casos_de_prueba.md)
+- [Informe de Resultados](./informe_de_resultados.md)
+
+### Ejecución de Pruebas
+
+Para ejecutar las pruebas, asegúrate de tener el entorno virtual activo y las dependencias de desarrollo instaladas:
+
+```bash
+pip install pytest pytest-asyncio pytest-cov httpx
+```
+
+**Comandos útiles:**
+
+| Objetivo | Comando |
+| --- | --- |
+| Ejecutar todos los tests | `pytest tests/ -v` |
+| Ejecutar con reporte de cobertura | `pytest tests/ -v --cov=.` |
+| Probar solo servicios | `pytest tests/test_services.py -v` |
+| Probar solo rutas | `pytest tests/test_routes.py -v` |
 
 ---
 

@@ -28,3 +28,11 @@ exports/
 .idea/
 
 *.pem
+
+# Testing
+.pytest_cache/
+.coverage
+results.xml
+test_inventory.db
+test_results.txt
+test_output.txt
