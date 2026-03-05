@@ -478,6 +478,29 @@ pip install pytest pytest-asyncio pytest-cov httpx
 
 ---
 
+## Despliegue a Producción
+
+Para entornos productivos, se recomienda seguir estos pasos:
+
+### 1. Variables de Entorno
+Asegúrate de establecer `APP_ENV=production` en tu archivo `.env`. Esto activará:
+- Restricción de CORS (debes configurar la URL real en `main.py`).
+- Desactivación de `/docs` y `/redoc` automáticos.
+- Manejo de errores global con mensajes genéricos para el cliente y logs detallados en el servidor.
+
+### 2. Ejecución con Gunicorn
+Se incluye un script `start_prod.sh` que utiliza Gunicorn con workers de Uvicorn para mayor estabilidad:
+
+```bash
+chmod +x start_prod.sh
+./start_prod.sh
+```
+
+### 3. Checklist Final
+Revisa el [Checklist de Producción](./production_checklist.md) para más detalles sobre seguridad y escalabilidad.
+
+---
+
 ## Licencia
 
 Este proyecto está bajo la licencia **MIT**.

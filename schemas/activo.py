@@ -21,5 +21,4 @@ class ActivoResponse(ActivoBase):
     origen: Optional[str]
     creado_en: Optional[str]
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
