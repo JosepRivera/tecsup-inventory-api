@@ -32,7 +32,7 @@ app = FastAPI(
 
 # CORS dinámico según ambiente
 origins = ["*"] if settings.APP_ENV != "production" else [
-    "https://tu-frontend-produccion.com", # Reemplazar con URL real
+    "https://tecsup-inventory-web-qrxd.vercel.app",
 ]
 
 app.add_middleware(
