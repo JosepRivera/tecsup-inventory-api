@@ -30,6 +30,36 @@ def seed(force=False):
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     
+    # Asegurar que las tablas existen antes de verificar el conteo
+    conn.execute("""
+    CREATE TABLE IF NOT EXISTS sesiones (
+        id          INTEGER PRIMARY KEY AUTOINCREMENT,
+        tecnico     TEXT,
+        pabellon    TEXT,
+        laboratorio TEXT,
+        armario     TEXT,
+        activa      INTEGER DEFAULT 1,
+        creada_en   DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+    """)
+    conn.execute("""
+    CREATE TABLE IF NOT EXISTS activos (
+        id          INTEGER PRIMARY KEY AUTOINCREMENT,
+        sesion_id   INTEGER,
+        nombre      TEXT,
+        marca       TEXT,
+        modelo      TEXT,
+        tipo        TEXT,
+        numero_serie TEXT,
+        estado      TEXT DEFAULT 'Bueno',
+        ubicacion   TEXT,
+        observaciones TEXT,
+        origen      TEXT,
+        creado_en   DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+    """)
+    conn.commit()
+
     # Verificar si ya existen sesiones para evitar duplicados, a menos que se use --force
     if not force:
         cursor = conn.execute("SELECT COUNT(*) as count FROM sesiones")
