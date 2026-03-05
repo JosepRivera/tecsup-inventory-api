@@ -1,10 +1,9 @@
 from datetime import datetime
-import pytz
+from zoneinfo import ZoneInfo
 
 def get_now_lima() -> datetime:
     """Retorna la fecha y hora actual en la zona horaria de Lima (UTC-5)."""
-    lima_tz = pytz.timezone('America/Lima')
-    return datetime.now(lima_tz)
+    return datetime.now(ZoneInfo('America/Lima'))
 
 def get_now_lima_str() -> str:
     """Retorna la fecha y hora actual en Lima como string formateado para SQLite."""
