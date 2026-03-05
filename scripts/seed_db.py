@@ -1,5 +1,6 @@
 import sqlite3
 import random
+import sys
 from datetime import datetime, timedelta
 
 DB_PATH = "database.db"
@@ -25,10 +26,19 @@ UBICACIONES = [
     ("Pabellón G", "Lab 202", "Armario D3"),
 ]
 
-def seed():
+def seed(force=False):
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     
+    # Verificar si ya existen sesiones para evitar duplicados, a menos que se use --force
+    if not force:
+        cursor = conn.execute("SELECT COUNT(*) as count FROM sesiones")
+        count = cursor.fetchone()["count"]
+        if count > 0:
+            print("La base de datos ya tiene datos. Saltando seeder (usa --force para ignorar).")
+            conn.close()
+            return
+
     print(f"Conectado a {DB_PATH}")
     
     # Crear algunas sesiones
@@ -77,4 +87,5 @@ def seed():
     print("Base de datos poblada con éxito.")
 
 if __name__ == "__main__":
-    seed()
+    force_flag = "--force" in sys.argv
+    seed(force=force_flag)
