@@ -8,7 +8,9 @@ from reportlab.lib.units import cm
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, HRFlowable
 from reportlab.lib.enums import TA_CENTER, TA_LEFT
 
-EXPORTS_DIR = "exports"
+# Directorio de exportaciones absoluto
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+EXPORTS_DIR = os.path.join(BASE_DIR, "exports")
 
 def _estilos():
     styles = getSampleStyleSheet()

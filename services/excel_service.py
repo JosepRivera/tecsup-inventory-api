@@ -7,7 +7,9 @@ from openpyxl.styles import (
 )
 from openpyxl.utils import get_column_letter
 
-EXPORTS_DIR = "exports"
+# Directorio de exportaciones absoluto
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+EXPORTS_DIR = os.path.join(BASE_DIR, "exports")
 
 _COLOR_HEADER     = "1a1a2e"
 _COLOR_FILA_PAR   = "f5f5f5"
